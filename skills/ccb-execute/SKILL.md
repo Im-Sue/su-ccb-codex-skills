@@ -54,14 +54,18 @@ node <ccb-execute-skill-dir>/scripts/ccb-execute-worktree.mjs validate-worktree 
   --pretty
 ```
 
-校验读取 `code_workspace.path` / `code_workspace.branch`，计算 `codeRoot = resolve(canonicalRoot, path)`，并确认 codeRoot 已存在且当前分支等于声明分支。字段缺失、path 不存在、branch 不匹配时，停止实施并回执拒绝原因；不要让 Codex 自己 ensure。
+校验读取 `code_workspace.path` / `code_workspace.branch`，计算主空间 `codeRoot = resolve(canonicalRoot, path)`，并确认 codeRoot 已存在且当前分支等于声明分支。字段缺失、path 不存在、branch 不匹配时，停止实施并回执拒绝原因；不要让 Codex 自己 ensure。
+
+dispatch brief 若附运行态空间表，必须同时消费该表。`canonicalRoot` 是主仓，专用于读取人读 docs 和经 plugin lib 写 `docs/.ccb`；主空间的 `codeRoot = resolve(canonicalRoot, code_workspace.path)`，专用于代码改动、git、测试和构建。若该需求声明多个实施空间，按 brief 空间表分别使用各空间自己的 codeRoot；字段缺失、路径不存在或分支不匹配时拒绝实施。
 
 路径纪律：
 
 1. `canonicalRoot` 是 ccb 启动 cwd / 主仓，只用于读取 spec、人读 docs，以及以绝对路径读写 `docs/.ccb` 真相。
-2. `codeRoot` 是 worktree；所有代码编辑、构建、lint、test 命令都必须以 `cwd=codeRoot` 执行。
+2. `codeRoot` 是 worktree；所有代码编辑、构建、lint、test 命令都必须以对应空间的 `cwd=codeRoot` 执行。
 3. git 命令必须写成 `git -C "$codeRoot" ...`，不得在主仓 cwd 下只传代码文件绝对路径。
-4. 不得把 canonical `docs/.ccb` 写入 worktree；commit 前必须运行 commit-guard。
+4. 多空间任务的路径纪律、验证和 auto-commit 按空间分别生效；跨空间改动不得混在同一个 git 工作区提交。
+5. 不得把 canonical `docs/.ccb` 写入 worktree；commit 前必须运行 commit-guard。
+6. 不得手工 bump root 的 submodule gitlink；空间间版本关联由 worktree association executor 统一同步和 verify。
 
 子任务级验证与 auto-commit：
 
