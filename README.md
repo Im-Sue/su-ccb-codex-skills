@@ -30,20 +30,22 @@
 - 索引维护（`docs/.ccb/index/`）
 - 详细文档编写
 
+<a id="install"></a>
+
 ## 快速开始
 
+先把这些 skills 装到**用户级** `~/.codex/skills`，再启动 CCB；CCB 派生的 Codex agent 才会继承并可用这些 skills。推荐用 `$skill-installer`，也可以手动 `cp`。
+
 ```bash
-# 方式 1：skill-installer（推荐）
+# 方式 1：skill-installer（推荐，安装到用户级 ~/.codex/skills）
 $skill-installer install https://github.com/Im-Sue/su-ccb-codex-skills/tree/main/skills/ccb-execute
 $skill-installer install https://github.com/Im-Sue/su-ccb-codex-skills/tree/main/skills/ccb-doc
-# 安装后重启 Codex 生效
+# 安装后重启 Codex；使用 CCB 时请先装再起 CCB
 
-# 方式 2：手动安装到用户级
+# 方式 2：手动安装到用户级 ~/.codex/skills
 git clone https://github.com/Im-Sue/su-ccb-codex-skills.git
+mkdir -p ~/.codex/skills
 cp -r su-ccb-codex-skills/skills/* ~/.codex/skills/
-
-# 或项目级安装
-mkdir -p .agents/skills && cp -r skills/* .agents/skills/
 ```
 
 ## 依赖与环境
